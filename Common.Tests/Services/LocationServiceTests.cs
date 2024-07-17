@@ -221,7 +221,6 @@ namespace Common.Tests.Services
         {
             IEnumerable<Location> entities = _fixture.GetMockEntities<Location>(60);
 
-
             var mapper = _fixture.CreateMapper();
 
             // Configurar el mock para aplicar filtros dinámicamente
@@ -238,8 +237,8 @@ namespace Common.Tests.Services
 
             LocationDynamicFieldsQueryFilter filter = new LocationQueryFilter
             {
-                MinId = 10,
-                MaxId = 13,
+                GreaterThanOrEqualId = 10,
+                LessThanOrEqualId = 13,
                 Page = 1,
                 PageSize = 10,
             };

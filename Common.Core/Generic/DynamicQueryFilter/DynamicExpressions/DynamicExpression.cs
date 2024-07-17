@@ -208,7 +208,7 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
 
             // Handling List<>
             if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>)
-                && propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.List))
+                && propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.ListFieldName))
             {
                 var list = ((IEnumerable)value).Cast<object>().ToList();
                 if (list.Count > 0)
@@ -220,7 +220,7 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
             // Handling string properties
             if (propertyType == typeof(string))
             {
-                if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.Contains))
+                if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.ContainsFieldName))
                 {
                     var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                     MethodCallExpression containsExpression = Expression.Call(propertyExpression, containsMethod, Expression.Constant(value));
@@ -251,17 +251,25 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
 
         private DynamicExpression<T, TQueryFilter> CreateDynamicExpressionRange(object value, string propertyName, string propertyNameWithoutPrefix)
         {
-            if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.Min) || propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.From))
+            if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.GreaterThanOrEqualFieldName.ToLower()))
             {
-                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, min: value);
+                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, greaterThanOrEqualValue: value);
             }
-            else if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.Max) || propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.To))
+            else if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.GreaterThanFieldName.ToLower()))
             {
-                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, max: value);
+                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, greaterThanValue: value);
+            }
+            else if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.LessThanOrEqualFieldName.ToLower()))
+            {
+                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, lessThanOrEqualValue: value);
+            }
+            else if (propertyName.ToLower().StartsWith(_dynamicFiltersConfiguration.LessThanFieldName.ToLower()))
+            {
+                return new RangeDynamicExpression<T, TQueryFilter>(propertyNameWithoutPrefix, lessThanValue: value);
             }
             else
             {
-                return new RangeDynamicExpression<T, TQueryFilter>(propertyName, equal: value);
+                return new RangeDynamicExpression<T, TQueryFilter>(propertyName, equalValue: value);
             }
         }
 

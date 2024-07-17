@@ -12,38 +12,38 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
 
         /// <summary>
         /// Array of prefixes used in dynamic field filtering.
-        /// For example, the ClientDynamicFieldsQueryFilter class may have properties prefixed with Max, Min, From, To, Contains, and List.
+        /// For example, the ClientDynamicFieldsQueryFilter class may have properties prefixed with LessThanOrEqualFieldName, GreaterThanOrEqualFieldName, GreaterThanFieldName, LessThanFieldName, Contains, and List.
         /// </summary>
-        public string[] PREFIXES { get => [Max, Min, From, To, Contains, List]; }
+        public string[] PREFIXES { get => [LessThanOrEqualFieldName, GreaterThanOrEqualFieldName, GreaterThanFieldName, LessThanFieldName, ContainsFieldName, ListFieldName]; }
 
         /// <summary>
-        /// Prefix for maximum value filters.
+        /// Prefix for less than or equal value filters.
         /// </summary>
-        public string Max { get; set; }
+        public string LessThanOrEqualFieldName { get; set; }
 
         /// <summary>
-        /// Prefix for minimum value filters.
+        /// Prefix for greater than or equal value filters.
         /// </summary>
-        public string Min { get; set; }
+        public string GreaterThanOrEqualFieldName { get; set; }
 
         /// <summary>
-        /// Prefix for start date or range filters.
+        /// Prefix for greater than value filters.
         /// </summary>
-        public string From { get; set; }
+        public string GreaterThanFieldName { get; set; }
 
         /// <summary>
-        /// Prefix for end date or range filters.
+        /// Prefix for less than value filters.
         /// </summary>
-        public string To { get; set; }
+        public string LessThanFieldName { get; set; }
 
         /// <summary>
         /// Prefix for contains or substring filters.
         /// </summary>
-        public string Contains { get; set; }
+        public string ContainsFieldName { get; set; }
 
         /// <summary>
         /// Prefix for list or collection filters.
         /// </summary>
-        public string List { get; set; }
+        public string ListFieldName { get; set; }
     }
 }

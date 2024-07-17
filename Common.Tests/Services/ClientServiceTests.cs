@@ -214,7 +214,7 @@ namespace Common.Tests.Services
         }
 
         [Theory, AutoMoq]
-        public async Task Get_ByDynamicFilter_MaxMin(
+        public async Task Get_ByDynamicFilter_GreaterThanOrEqualLessThanOrEqual(
             [Frozen] Mock<IRepository<Client>> repo,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             [Frozen] Mock<IValidationService> validationService)
@@ -238,11 +238,57 @@ namespace Common.Tests.Services
 
             ClientDynamicFieldsQueryFilter filter = new ClientQueryFilter
             {
-                MinId = 10,
-                MaxId = 13,
+                GreaterThanOrEqualId = 10,
+                LessThanOrEqualId = 13,
                 Page = 1,
                 PageSize = 10,
             };
+
+            var result = await sut.Get<ClientDto, ClientDynamicFieldsQueryFilter>(filter);
+
+            result.Should().NotBeNull();
+            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Items.Should().NotBeNull();
+            result.Items.Count().Should().Be(filteredEntitiesMockl.Count());
+            result.Items.First().Id.Should().Be(filteredEntitiesMockl.First().Id);
+            result.Items.Last().Id.Should().Be(filteredEntitiesMockl.Last().Id);
+            result.Page.Should().Be(filter.Page);
+            result.PageSize.Should().Be(filter.PageSize);
+            result.TotalCount.Should().Be(filteredEntitiesMockl.Count());
+        }
+        [Theory, AutoMoq]
+        public async Task Get_ByDynamicFilter_GreaterThanLessThan(
+            [Frozen] Mock<IRepository<Client>> repo,
+            [Frozen] IOptions<DynamicFiltersConfiguration> config,
+            [Frozen] Mock<IValidationService> validationService)
+        {
+            IEnumerable<Client> entities = _fixture.GetMockEntities<Client>(60);
+
+
+            var mapper = _fixture.CreateMapper();
+
+            // Configurar el mock para aplicar filtros dinámicamente
+            IQueryable<Client> filteredEntitiesMockl = default;
+            repo.Setup(r => r.Get(It.IsAny<IDynamicExpression<Client>>()))
+                .Returns((IDynamicExpression<Client> exp) =>
+                {
+                    var filteredEntities = entities.AsQueryable().Where(exp.Predicate()).AsQueryable();
+                    filteredEntitiesMockl = filteredEntities.BuildMock();
+                    return filteredEntitiesMockl;
+                });
+
+            var sut = new ClientService(repo.Object, validationService.Object, mapper, config);
+
+            ClientDynamicFieldsQueryFilter filter = new ClientQueryFilter
+            {
+                GreaterThanId = 10,
+                LessThanId = 13,
+                Page = 1,
+                PageSize = 10,
+            };
+
+            //TODO: agregar esta comprobacion tambien en Get_ByDynamicFilter_GreaterThanOrEqualLessThanOrEqual()
+            var expectedResults = entities.Where(c => c.Id > filter.GreaterThanId && c.Id < filter.LessThanId).ToList();
 
             var result = await sut.Get<ClientDto, ClientDynamicFieldsQueryFilter>(filter);
 

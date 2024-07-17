@@ -238,8 +238,8 @@ namespace Common.Tests.Services
 
             PhotographerDynamicFieldsQueryFilter filter = new PhotographerQueryFilter
             {
-                MinId = 10,
-                MaxId = 13,
+                GreaterThanOrEqualId = 10,
+                LessThanOrEqualId = 13,
                 Page = 1,
                 PageSize = 10,
             };

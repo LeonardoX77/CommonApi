@@ -10,26 +10,38 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
     /// <typeparam name="TQueryFilter">DTO Entity</typeparam>
     public class RangeDynamicExpression<T, TQueryFilter> : DynamicExpression<T, TQueryFilter>
         where T : class, new()
-    where TQueryFilter : class, IDynamicQueryFilter, new()
+        where TQueryFilter : class, IDynamicQueryFilter, new()
     {
-        private readonly object _min;
-        private readonly object _max;
-        private readonly object _equal;
+        private readonly object _greaterThanOrEqualValue;
+        private readonly object _lessThanOrEqualValue;
+        private readonly object _equalValue;
+        private readonly object _greaterThanValue;
+        private readonly object _lessThanValue;
         private readonly string _propertyName;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="propertyName">The name of the property to filter.</param>
-        /// <param name="min">Minimum value for the range filter.</param>
-        /// <param name="max">Maximum value for the range filter.</param>
-        /// <param name="equal">Specific value for equality filter.</param>
-        public RangeDynamicExpression(string propertyName, object min = null, object max = null, object equal = null)
+        /// <param name="greaterThanOrEqualValue">Minimum value for the range filter.</param>
+        /// <param name="lessThanOrEqualValue">Maximum value for the range filter.</param>
+        /// <param name="equalValue">Specific value for equality filter.</param>
+        /// <param name="greaterThanValue">Minimum exclusive value for the range filter.</param>
+        /// <param name="lessThanValue">Maximum exclusive value for the range filter.</param>
+        public RangeDynamicExpression(
+            string propertyName, 
+            object greaterThanOrEqualValue = null, 
+            object lessThanOrEqualValue = null, 
+            object equalValue = null,
+            object greaterThanValue = null,
+            object lessThanValue = null)
         {
             _propertyName = propertyName;
-            _min = min;
-            _max = max;
-            _equal = equal;
+            _greaterThanOrEqualValue = greaterThanOrEqualValue;
+            _lessThanOrEqualValue = lessThanOrEqualValue;
+            _equalValue = equalValue;
+            _greaterThanValue = greaterThanValue;
+            _lessThanValue = lessThanValue;
             _predicate = SetPredicate();
         }
 
@@ -44,13 +56,19 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
             Expression finalExpression = Expression.Constant(true, typeof(bool));
 
             // Apply minimum value comparison if specified
-            finalExpression = GetMinComparison(propertyExpression, finalExpression);
+            finalExpression = GetGreaterThanOrEqualExpression(propertyExpression, finalExpression);
 
             // Apply maximum value comparison if specified
-            finalExpression = GetMaxComparison(propertyExpression, finalExpression);
+            finalExpression = GetLessThanOrEqualExpression(propertyExpression, finalExpression);
 
             // Apply equality comparison if specified
-            finalExpression = GetEqualComparison(propertyExpression, finalExpression);
+            finalExpression = GetEqualExpression(propertyExpression, finalExpression);
+
+            // Apply exclusive minimum value comparison if specified
+            finalExpression = GetGreaterThanExpression(propertyExpression, finalExpression);
+
+            // Apply exclusive maximum value comparison if specified
+            finalExpression = GetLessThanExpression(propertyExpression, finalExpression);
 
             return Expression.Lambda<Func<T, bool>>(finalExpression, parameter);
         }
@@ -61,13 +79,13 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
         /// <param name="propertyExpression">The property expression.</param>
         /// <param name="finalExpression">The final expression to combine with.</param>
         /// <returns>Combined expression with equality comparison.</returns>
-        private Expression GetEqualComparison(MemberExpression propertyExpression, Expression finalExpression)
+        private Expression GetEqualExpression(MemberExpression propertyExpression, Expression finalExpression)
         {
-            if (_equal != null)
+            if (_equalValue != null)
             {
                 Expression equalExpression = Expression.Equal(
-                    Expression.Convert(propertyExpression, _equal.GetType()),
-                    Expression.Constant(_equal, _equal.GetType())
+                    Expression.Convert(propertyExpression, _equalValue.GetType()),
+                    Expression.Constant(_equalValue, _equalValue.GetType())
                 );
                 finalExpression = Expression.AndAlso(finalExpression, equalExpression);
             }
@@ -81,13 +99,13 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
         /// <param name="propertyExpression">The property expression.</param>
         /// <param name="finalExpression">The final expression to combine with.</param>
         /// <returns>Combined expression with maximum value comparison.</returns>
-        private Expression GetMaxComparison(MemberExpression propertyExpression, Expression finalExpression)
+        private Expression GetLessThanOrEqualExpression(MemberExpression propertyExpression, Expression finalExpression)
         {
-            if (_max != null)
+            if (_lessThanOrEqualValue != null)
             {
                 Expression maxExpression = Expression.LessThanOrEqual(
-                    Expression.Convert(propertyExpression, _max.GetType()),
-                    Expression.Constant(_max, _max.GetType())
+                    Expression.Convert(propertyExpression, _lessThanOrEqualValue.GetType()),
+                    Expression.Constant(_lessThanOrEqualValue, _lessThanOrEqualValue.GetType())
                 );
                 finalExpression = Expression.AndAlso(finalExpression, maxExpression);
             }
@@ -101,15 +119,55 @@ namespace Common.Core.Generic.DynamicQueryFilter.DynamicExpressions
         /// <param name="propertyExpression">The property expression.</param>
         /// <param name="finalExpression">The final expression to combine with.</param>
         /// <returns>Combined expression with minimum value comparison.</returns>
-        private Expression GetMinComparison(MemberExpression propertyExpression, Expression finalExpression)
+        private Expression GetGreaterThanOrEqualExpression(MemberExpression propertyExpression, Expression finalExpression)
         {
-            if (_min != null)
+            if (_greaterThanOrEqualValue != null)
             {
                 Expression minExpression = Expression.GreaterThanOrEqual(
-                    Expression.Convert(propertyExpression, _min.GetType()),
-                    Expression.Constant(_min, _min.GetType())
+                    Expression.Convert(propertyExpression, _greaterThanOrEqualValue.GetType()),
+                    Expression.Constant(_greaterThanOrEqualValue, _greaterThanOrEqualValue.GetType())
                 );
                 finalExpression = Expression.AndAlso(finalExpression, minExpression);
+            }
+
+            return finalExpression;
+        }
+
+        /// <summary>
+        /// Creates an exclusive minimum value comparison expression.
+        /// </summary>
+        /// <param name="propertyExpression">The property expression.</param>
+        /// <param name="finalExpression">The final expression to combine with.</param>
+        /// <returns>Combined expression with exclusive minimum value comparison.</returns>
+        private Expression GetGreaterThanExpression(MemberExpression propertyExpression, Expression finalExpression)
+        {
+            if (_greaterThanValue != null)
+            {
+                Expression minExpression = Expression.GreaterThan(
+                    Expression.Convert(propertyExpression, _greaterThanValue.GetType()),
+                    Expression.Constant(_greaterThanValue, _greaterThanValue.GetType())
+                );
+                finalExpression = Expression.AndAlso(finalExpression, minExpression);
+            }
+
+            return finalExpression;
+        }
+
+        /// <summary>
+        /// Creates an exclusive maximum value comparison expression.
+        /// </summary>
+        /// <param name="propertyExpression">The property expression.</param>
+        /// <param name="finalExpression">The final expression to combine with.</param>
+        /// <returns>Combined expression with exclusive maximum value comparison.</returns>
+        private Expression GetLessThanExpression(MemberExpression propertyExpression, Expression finalExpression)
+        {
+            if (_lessThanValue != null)
+            {
+                Expression maxExpression = Expression.LessThan(
+                    Expression.Convert(propertyExpression, _lessThanValue.GetType()),
+                    Expression.Constant(_lessThanValue, _lessThanValue.GetType())
+                );
+                finalExpression = Expression.AndAlso(finalExpression, maxExpression);
             }
 
             return finalExpression;
