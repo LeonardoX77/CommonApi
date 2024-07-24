@@ -56,10 +56,10 @@ namespace Common.Tests.Services
             var mapper = _fixture.CreateMapper();
             var sut = new ClientService(repo.Object, validationService.Object, mapper, config);
 
-            ClientDto dto = await sut.GetByPKAsync<ClientDto>(expectedEntity.Id);
+            ClientRequestDto dto = await sut.GetByPKAsync<ClientRequestDto>(expectedEntity.Id);
 
             dto.Should().NotBeNull();
-            dto.Should().BeOfType<ClientDto>();
+            dto.Should().BeOfType<ClientRequestDto>();
             dto.Id.Should().Be(expectedEntity.Id);
         }
 
@@ -100,10 +100,10 @@ namespace Common.Tests.Services
 
             var sut = new ClientService(repo.Object, validationService.Object, mapper, config);
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(1);
             result.Items.Single().Id.Should().Be(entity.Id);
@@ -135,10 +135,10 @@ namespace Common.Tests.Services
 
             var sut = new ClientService(repo.Object, validationService.Object, mapper, config);
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(1);
             result.Items.Single().Id.Should().Be(entity.Id);
@@ -168,10 +168,10 @@ namespace Common.Tests.Services
                 Disabled = true
             };
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filter.ListId.Count);
             result.Page.Should().Be(1);
@@ -202,10 +202,10 @@ namespace Common.Tests.Services
                 PageSize = 10,
             };
 
-            var result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            var result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filter.PageSize);
             result.Page.Should().Be(filter.Page);
@@ -214,7 +214,7 @@ namespace Common.Tests.Services
         }
 
         [Theory, AutoMoq]
-        public async Task Get_ByDynamicFilter_GreaterThanOrEqualLessThanOrEqual(
+        public async Task Get_ByDynamicFilter_GreaterThanOrEqualAndLessThanOrEqualNumber(
             [Frozen] Mock<IRepository<Client>> repo,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             [Frozen] Mock<IValidationService> validationService)
@@ -224,7 +224,6 @@ namespace Common.Tests.Services
 
             var mapper = _fixture.CreateMapper();
 
-            // Configurar el mock para aplicar filtros dinámicamente
             IQueryable<Client> filteredEntitiesMockl = default;
             repo.Setup(r => r.Get(It.IsAny<IDynamicExpression<Client>>()))
                 .Returns((IDynamicExpression<Client> exp) =>
@@ -244,14 +243,57 @@ namespace Common.Tests.Services
                 PageSize = 10,
             };
 
-            var result = await sut.Get<ClientDto, ClientDynamicFieldsQueryFilter>(filter);
+            var result = await sut.Get<ClientRequestDto, ClientDynamicFieldsQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filteredEntitiesMockl.Count());
-            result.Items.First().Id.Should().Be(filteredEntitiesMockl.First().Id);
-            result.Items.Last().Id.Should().Be(filteredEntitiesMockl.Last().Id);
+            result.Items.First().Id.Should().Be(10);
+            result.Items.Last().Id.Should().Be(13);
+            result.Page.Should().Be(filter.Page);
+            result.PageSize.Should().Be(filter.PageSize);
+            result.TotalCount.Should().Be(filteredEntitiesMockl.Count());
+        }
+        [Theory, AutoMoq]
+        public async Task Get_ByDynamicFilter_GreaterThanOrEqualAndLessThanOrEqualDateTime(
+            [Frozen] Mock<IRepository<Client>> repo,
+            [Frozen] IOptions<DynamicFiltersConfiguration> config,
+            [Frozen] Mock<IValidationService> validationService)
+        {
+            IEnumerable<Client> entities = _fixture.GetMockEntities<Client>(60);
+            var dateStart = DateTime.Now.AddYears(-20);
+            var dateEnd = DateTime.Now.AddYears(20);
+            entities.First().BirthDate = dateStart;
+
+            var mapper = _fixture.CreateMapper();
+
+            IQueryable<Client> filteredEntitiesMockl = default;
+            repo.Setup(r => r.Get(It.IsAny<IDynamicExpression<Client>>()))
+                .Returns((IDynamicExpression<Client> exp) =>
+                {
+                    var filteredEntities = entities.AsQueryable().Where(exp.Predicate()).AsQueryable();
+                    filteredEntitiesMockl = filteredEntities.BuildMock();
+                    return filteredEntitiesMockl;
+                });
+
+            var sut = new ClientService(repo.Object, validationService.Object, mapper, config);
+
+            ClientDynamicFieldsQueryFilter filter = new ClientQueryFilter
+            {
+                GreaterThanOrEqualBirthDate = dateStart,
+                LessThanOrEqualBirthDate = dateEnd,
+                Page = 1,
+                PageSize = 10,
+            };
+
+            var result = await sut.Get<ClientRequestDto, ClientDynamicFieldsQueryFilter>(filter);
+
+            result.Should().NotBeNull();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
+            result.Items.Should().NotBeNull();
+            result.Items.Count().Should().Be(filteredEntitiesMockl.Count());
+            result.Items.First().Id.Should().Be(10);
             result.Page.Should().Be(filter.Page);
             result.PageSize.Should().Be(filter.PageSize);
             result.TotalCount.Should().Be(filteredEntitiesMockl.Count());
@@ -267,7 +309,6 @@ namespace Common.Tests.Services
 
             var mapper = _fixture.CreateMapper();
 
-            // Configurar el mock para aplicar filtros dinámicamente
             IQueryable<Client> filteredEntitiesMockl = default;
             repo.Setup(r => r.Get(It.IsAny<IDynamicExpression<Client>>()))
                 .Returns((IDynamicExpression<Client> exp) =>
@@ -290,10 +331,10 @@ namespace Common.Tests.Services
             //TODO: agregar esta comprobacion tambien en Get_ByDynamicFilter_GreaterThanOrEqualLessThanOrEqual()
             var expectedResults = entities.Where(c => c.Id > filter.GreaterThanId && c.Id < filter.LessThanId).ToList();
 
-            var result = await sut.Get<ClientDto, ClientDynamicFieldsQueryFilter>(filter);
+            var result = await sut.Get<ClientRequestDto, ClientDynamicFieldsQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filteredEntitiesMockl.Count());
             result.Items.First().Id.Should().Be(filteredEntitiesMockl.First().Id);
@@ -312,7 +353,6 @@ namespace Common.Tests.Services
 
             var mapper = _fixture.CreateMapper();
 
-            // Configurar el mock para aplicar filtros dinámicamente
             IQueryable<Client> filteredEntitiesMockl = default;
             repo.Setup(r => r.Get(It.IsAny<IDynamicExpression<Client>>()))
                 .Returns((IDynamicExpression<Client> exp) =>
@@ -331,10 +371,10 @@ namespace Common.Tests.Services
                 PageSize = 10,
             };
 
-            var result = await sut.Get<ClientDto, ClientDynamicFieldsQueryFilter>(filter);
+            var result = await sut.Get<ClientRequestDto, ClientDynamicFieldsQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filteredEntitiesMockl.Count());
             result.Items.All(x => filter.ListId.Contains(x.Id));
@@ -372,10 +412,10 @@ namespace Common.Tests.Services
                 SortingFields = nameof(Client.Name),
             };
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filter.PageSize);
             result.Page.Should().Be(filter.Page);
@@ -408,10 +448,10 @@ namespace Common.Tests.Services
                 SortingFields = "Name desc",
             };
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Should().NotBeNull();
             result.Items.Count().Should().Be(filter.PageSize);
             result.Page.Should().Be(filter.Page);
@@ -426,7 +466,7 @@ namespace Common.Tests.Services
             [Frozen] Mock<IValidationService> validationService,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             Client entity,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
             //
             var mapper = _fixture.CreateMapper();
@@ -521,7 +561,7 @@ namespace Common.Tests.Services
             [Frozen] Mock<IValidationService> validationService,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             Client entity,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
 
             var mapper = _fixture.CreateMapper();
@@ -543,7 +583,7 @@ namespace Common.Tests.Services
             [Frozen] Mock<IValidationService> validationService,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             Client entity,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
 
             var mapper = _fixture.CreateMapper();
@@ -571,7 +611,7 @@ namespace Common.Tests.Services
             [Frozen] Mock<IValidationService> validationService,
             [Frozen] IOptions<DynamicFiltersConfiguration> config,
             Client entity,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
 
             var mapper = _fixture.CreateMapper();
@@ -637,10 +677,10 @@ namespace Common.Tests.Services
                 Disabled = true
             };
 
-            IPaginatedResult<ClientDto> result = await sut.Get<ClientDto, ClientQueryFilter>(filter);
+            IPaginatedResult<ClientRequestDto> result = await sut.Get<ClientRequestDto, ClientQueryFilter>(filter);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PaginatedResult<ClientDto>>();
+            result.Should().BeOfType<PaginatedResult<ClientRequestDto>>();
             result.Items.Count().Should().Be(entities.Count());
             result.TotalCount.Should().Be(entities.Count());
         }

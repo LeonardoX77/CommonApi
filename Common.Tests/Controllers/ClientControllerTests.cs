@@ -22,9 +22,9 @@ namespace Common.Tests.Controllers
         public async Task GetAsync_ById_OK(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
-            service.Setup(service => service.GetByPKAsync<ClientDto>(It.IsAny<int>())).ReturnsAsync(() => dto);
+            service.Setup(service => service.GetByPKAsync<ClientRequestDto>(It.IsAny<int>())).ReturnsAsync(() => dto);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -35,9 +35,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<OkObjectResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result.Value.Should().BeOfType<Response<ClientDto>>();
+            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
 
-            var body = result.Value.As<Response<ClientDto>>();
+            var body = result.Value.As<Response<ClientRequestDto>>();
             body.Data.Should().NotBeNullOrEmpty();
             body.Data.Count.Should().Be(1);
             body.Error.Should().BeNull();
@@ -50,7 +50,7 @@ namespace Common.Tests.Controllers
             [Frozen] Mock<IBaseService<Client, int>> service,
             int id)
         {
-            service.Setup(service => service.GetByPKAsync<ClientDto>(id)).ReturnsAsync(() => null);
+            service.Setup(service => service.GetByPKAsync<ClientRequestDto>(id)).ReturnsAsync(() => null);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -70,13 +70,13 @@ namespace Common.Tests.Controllers
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
             ClientQueryFilter filter,
-            PaginatedResult<ClientDto> expectedEntities)
+            PaginatedResult<ClientRequestDto> expectedEntities)
         {
             expectedEntities.Page = 1;
             expectedEntities.PageSize = 50;
             expectedEntities.TotalCount = expectedEntities.Items.Count();
 
-            service.Setup(service => service.Get<ClientDto, ClientQueryFilter>(filter)).ReturnsAsync(expectedEntities);
+            service.Setup(service => service.Get<ClientRequestDto, ClientQueryFilter>(filter)).ReturnsAsync(expectedEntities);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -87,9 +87,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<OkObjectResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result.Value.Should().BeOfType<Response<ClientDto>>();
+            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
 
-            var body = result.Value.As<Response<ClientDto>>();
+            var body = result.Value.As<Response<ClientRequestDto>>();
             body.Data.Should().NotBeEmpty();
             body.Error.Should().BeNull();
             body.TotalRecords.Should().Be(expectedEntities.TotalCount);
@@ -99,10 +99,10 @@ namespace Common.Tests.Controllers
         public async Task Create_OK(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientDto dto,
+            ClientRequestDto dto,
             Client entity)
         {
-            service.Setup(service => service.AddAsync(It.IsAny<ClientDto>())).ReturnsAsync(() => entity);
+            service.Setup(service => service.AddAsync(It.IsAny<ClientRequestDto>())).ReturnsAsync(() => entity);
 
             var sut = new ClientController(log.Object, service.Object);
             // Mock ControllerContext and ActionDescriptor
@@ -122,9 +122,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<CreatedAtRouteResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.Created);
-            result.Value.Should().BeOfType<Response<ClientDto>>();
+            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
 
-            var body = result.Value.As<Response<ClientDto>>();
+            var body = result.Value.As<Response<ClientRequestDto>>();
             body.Data.Should().NotBeNullOrEmpty();
             body.Data.Count.Should().Be(1);
             body.Error.Should().BeNull();
@@ -135,9 +135,9 @@ namespace Common.Tests.Controllers
         public async Task Update_OK(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
-            service.Setup(s => s.ValidateDto<ClientDto, ClientDtoValidator>(CrudAction.UPDATE_PATCH, dto)).Verifiable();
+            service.Setup(s => s.ValidateDto<ClientRequestDto, ClientRequestDtoValidator>(CrudAction.UPDATE_PATCH, dto)).Verifiable();
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -155,7 +155,7 @@ namespace Common.Tests.Controllers
         public async Task Update_ReturnsHandledError_KO(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
             service.Setup(service => service.UpdateAsync(dto))
                 .ThrowsAsync(new NoDbRecordException(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
@@ -201,9 +201,9 @@ namespace Common.Tests.Controllers
         public async Task Modify_OK(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientDto dto)
+            ClientRequestDto dto)
         {
-            service.Setup(s => s.ValidateDto<ClientDto, ClientDtoValidator>(CrudAction.UPDATE_PATCH, dto)).Verifiable();
+            service.Setup(s => s.ValidateDto<ClientRequestDto, ClientRequestDtoValidator>(CrudAction.UPDATE_PATCH, dto)).Verifiable();
 
             var sut = new ClientController(log.Object, service.Object);
 

@@ -10,7 +10,7 @@ namespace Common.WebApi.Application.Controllers
     /// <summary>
     /// Controller for managing Sessions.
     /// </summary>
-    public class SessionController : GenericControllerBase<Session, SessionDto, SessionQueryFilter, SessionDtoValidator>
+    public class SessionController : GenericControllerBase<Session, SessionDto, SessionDto, SessionQueryFilter, SessionDtoValidator>
     {
         /// <summary>
         /// Constructor.

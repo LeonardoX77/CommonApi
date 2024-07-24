@@ -59,19 +59,19 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// <summary>
         /// Get a filtered list of entities
         /// </summary>
-        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TResultDto"></typeparam>
         /// <typeparam name="TQueryFilter"></typeparam>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public async virtual Task<IActionResult> Get<TDto, TQueryFilter>(TQueryFilter filter)
+        public async virtual Task<IActionResult> Get<TResultDto, TQueryFilter>(TQueryFilter filter)
             where TQueryFilter : class, IDynamicQueryFilter, IPagination, new()
         {
-            IPaginatedResult<TDto> result = await _baseService.Get<TDto, TQueryFilter>(filter);
+            IPaginatedResult<TResultDto> result = await _baseService.Get<TResultDto, TQueryFilter>(filter);
 
             if (result != null)
             {
                 return result.Items.Count() > 0
-                    ? Ok(new Response<TDto>(result.Items.ToList(), result.Page, result.PageSize, result.TotalCount))
+                    ? Ok(new Response<TResultDto>(result.Items.ToList(), result.Page, result.PageSize, result.TotalCount))
                     : NoContent();
             }
 
@@ -81,26 +81,28 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// <summary>
         /// Validates and creates an entity
         /// </summary>
-        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TResultDto"></typeparam>
+        /// <typeparam name="TRequestDto"></typeparam>
         /// <typeparam name="TValidator"></typeparam>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async virtual Task<IActionResult> Create<TDto, TValidator>(TDto dto)
-            where TDto : class, IEntity
-            where TValidator : AbstractValidator<TDto>
+        public async virtual Task<IActionResult> Create<TResultDto, TRequestDto, TValidator>(TRequestDto dto)
+            where TResultDto : class, IEntity
+            where TRequestDto : class, IEntity
+            where TValidator : AbstractValidator<TRequestDto>
         {
-            _baseService.ValidateDto<TDto, TValidator>(CrudAction.CREATE, dto);
+            _baseService.ValidateDto<TRequestDto, TValidator>(CrudAction.CREATE, dto);
 
             T result = await _baseService.AddAsync(dto);
 
             if (result != null)
             {
-                TDto resultDto = _baseService.MapEntityToDto<TDto>(result);
+                TResultDto resultDto = _baseService.MapEntityToDto<TResultDto>(result);
                 var controllerName = ControllerContext.ActionDescriptor.ControllerName;
                 return CreatedAtRoute(
                     $"{controllerName}/Get",
                     new { id = result.Id },
-                    new Response<TDto>(resultDto));
+                    new Response<TResultDto>(resultDto));
             }
 
             return Ko(new BaseResponse((int)HttpStatusCode.InternalServerError));

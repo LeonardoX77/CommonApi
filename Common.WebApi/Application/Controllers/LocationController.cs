@@ -10,7 +10,7 @@ namespace Common.WebApi.Application.Controllers
     /// <summary>
     /// Controller for managing Locations.
     /// </summary>
-    public class LocationController : GenericControllerBase<Location, LocationDto, LocationQueryFilter, LocationDtoValidator>
+    public class LocationController : GenericControllerBase<Location, LocationDto, LocationDto, LocationQueryFilter, LocationDtoValidator>
     {
         /// <summary>
         /// Constructor.

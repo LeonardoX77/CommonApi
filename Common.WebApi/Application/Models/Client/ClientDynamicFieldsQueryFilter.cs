@@ -45,22 +45,42 @@ namespace Common.WebApi.Application.Models.Client
         public string[]? ListName { get; set; }
 
         /// <summary>
-        /// Date created from (GreaterThanOrEqual).
+        /// GreaterThanOrEqual date
+        /// </summary>
+        public DateTime? GreaterThanOrEqualBirthDate { get; set; }
+
+        /// <summary>
+        /// LessThanOrEqual date
+        /// </summary>
+        public DateTime? LessThanOrEqualBirthDate { get; set; }
+
+        /// <summary>
+        /// GreaterThan date
+        /// </summary>
+        public DateTime? GreaterThanBirthDate { get; set; }
+
+        /// <summary>
+        /// LessThan date
+        /// </summary>
+        public DateTime? LessThanBirthDate { get; set; }
+
+        /// <summary>
+        /// GreaterThanOrEqual date
         /// </summary>
         public DateTime? GreaterThanOrEqualDateCreated { get; set; }
 
         /// <summary>
-        /// Date created to (LessThanOrEqual).
+        /// LessThanOrEqual date
         /// </summary>
         public DateTime? LessThanOrEqualDateCreated { get; set; }
 
         /// <summary>
-        /// Date created greater than (GreaterThan).
+        /// GreaterThan date
         /// </summary>
         public DateTime? GreaterThanDateCreated { get; set; }
 
         /// <summary>
-        /// Date created less than (LessThan).
+        /// LessThan date
         /// </summary>
         public DateTime? LessThanDateCreated { get; set; }
     }

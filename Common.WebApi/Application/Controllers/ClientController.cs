@@ -10,7 +10,7 @@ namespace Common.WebApi.Application.Controllers
     /// <summary>
     /// Controller for managing clients.
     /// </summary>
-    public class ClientController : GenericControllerBase<Client, ClientDto, ClientQueryFilter, ClientDtoValidator>
+    public class ClientController : GenericControllerBase<Client, ClientRequestDto, ClientResponseDto, ClientQueryFilter, ClientRequestDtoValidator>
     {
         /// <summary>
         /// Constructor.

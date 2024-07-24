@@ -12,7 +12,7 @@ namespace Common.WebApi.Application.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<Client, ClientDto>().ReverseMap();
+            CreateMap<Client, ClientRequestDto>().ReverseMap();
             CreateMap<Photographer, PhotographerDto>().ReverseMap();
             CreateMap<Session, SessionDto>().ReverseMap();
             CreateMap<Location, LocationDto>().ReverseMap();

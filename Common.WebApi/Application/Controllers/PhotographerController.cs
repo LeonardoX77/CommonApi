@@ -9,7 +9,7 @@ namespace Common.WebApi.Application.Controllers
     /// <summary>
     /// Controller for managing Photographers.
     /// </summary>
-    public class PhotographerController : GenericControllerBase<Photographer, PhotographerDto, PhotographerQueryFilter, PhotographerDtoValidator>
+    public class PhotographerController : GenericControllerBase<Photographer, PhotographerDto, PhotographerDto, PhotographerQueryFilter, PhotographerDtoValidator>
     {
         /// <summary>
         /// Constructor.

@@ -23,8 +23,9 @@ namespace Common.WebApi.Application.Controllers.Generic.Interfaces
             where TDto : class, IEntity
             where TValidator : AbstractValidator<TDto>;
 
-        Task<IActionResult> Create<TDto, TValidator>(TDto dto)
-            where TDto : class, IEntity
-            where TValidator : AbstractValidator<TDto>;
+        Task<IActionResult> Create<TResultDto, TRequestDto, TValidator>(TRequestDto dto)
+            where TResultDto : class, IEntity
+            where TRequestDto : class, IEntity
+            where TValidator : AbstractValidator<TRequestDto>;
     }
 }
