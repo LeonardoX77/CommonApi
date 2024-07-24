@@ -32,6 +32,9 @@ namespace Common.Domain.Entities.Configurations
                    .HasMaxLength(15)
                    .IsRequired();
 
+            builder.Property(c => c.Comments)
+                    .HasMaxLength(254);
+
             builder.HasMany(c => c.Sessions)
                    .WithOne(s => s.Client)
                    .HasForeignKey(s => s.ClientId)
