@@ -1,16 +1,16 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Common.WebApi.Infrastructure.Models.Response;
 using Common.Core.Data.Identity.Enums;
 using Common.Core.Data.Interfaces;
 using System.Net;
 
 using Microsoft.AspNetCore.Authorization;
 using Common.Core.Generic.DynamicQueryFilter.Interfaces;
-using Common.WebApi.Application.Models.Client;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Common.Core.Generic.Controllers.Response;
+using Microsoft.Extensions.Logging;
 
-namespace Common.WebApi.Application.Controllers.Generic
+namespace Common.Core.Generic.Controllers
 {
     /// <summary>
     /// Controller base which inherits from BaseController and provides additional features:
@@ -34,7 +34,7 @@ namespace Common.WebApi.Application.Controllers.Generic
         where TValidator : AbstractValidator<TRequestDto>, new()
     {
         public GenericControllerBase(
-            ILogger<BaseController<TEntity, int>> logger, 
+            ILogger<BaseController<TEntity, int>> logger,
             IBaseService<TEntity, int> service) : base(logger, service) { }
 
         /// <summary>

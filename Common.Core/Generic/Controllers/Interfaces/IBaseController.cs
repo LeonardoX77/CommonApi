@@ -4,7 +4,7 @@ using Common.Core.Data.Identity.Enums;
 using Common.Core.Data.Interfaces;
 using Common.Core.Generic.DynamicQueryFilter.Interfaces;
 
-namespace Common.WebApi.Application.Controllers.Generic.Interfaces
+namespace Common.Core.Generic.Controllers.Interfaces
 {
     internal interface IBaseController<T, TKey>
         where T : class

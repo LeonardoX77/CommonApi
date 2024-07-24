@@ -1,6 +1,6 @@
 using Common.Core.CustomExceptions;
 
-namespace Common.WebApi.Infrastructure.Models.Response
+namespace Common.Core.Generic.Controllers.Response
 {
     /// <summary>
     /// Response model.

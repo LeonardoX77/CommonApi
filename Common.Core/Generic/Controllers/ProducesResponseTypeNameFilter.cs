@@ -2,7 +2,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
-namespace Common.WebApi.Application.Controllers.Generic
+namespace Common.Core.Generic.Controllers
 {
     /// <summary>
     /// An action filter that dynamically sets the response type for a controller action 

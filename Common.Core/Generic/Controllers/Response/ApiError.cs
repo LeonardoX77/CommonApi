@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Common.WebApi.Infrastructure.Models.Response
+namespace Common.Core.Generic.Controllers.Response
 {
     public class ApiError
     {
@@ -42,6 +42,6 @@ namespace Common.WebApi.Infrastructure.Models.Response
         /// </summary>
         public string Message { get; set; }
 
-        public List<string> Errors { get; internal set; }
+        public List<string> Errors { get; set; }
     }
 }

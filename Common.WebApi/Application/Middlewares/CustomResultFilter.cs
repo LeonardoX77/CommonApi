@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Common.WebApi.Infrastructure.Models.Response;
 using Common.Core.CustomExceptions;
 using System.Net;
+using Common.Core.Generic.Controllers.Response;
 
 namespace Common.WebApi.Application.Middlewares
 {

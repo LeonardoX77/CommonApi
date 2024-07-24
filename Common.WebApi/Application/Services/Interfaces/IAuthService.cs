@@ -1,6 +1,6 @@
 using Common.WebApi.Application.Models.User;
-using Common.WebApi.Infrastructure.Models.Response;
 using Common.Core.Data.Identity;
+using Common.Core.Generic.Controllers.Response;
 
 namespace Common.WebApi.Application.Services.Interfaces
 {

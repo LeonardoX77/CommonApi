@@ -1,5 +1,4 @@
-
-namespace Common.WebApi.Application.Controllers.Generic
+namespace Common.Core.Generic.Controllers
 {
 
     /// <summary>

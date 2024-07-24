@@ -2,7 +2,7 @@ using Common.Domain.Entities;
 using Common.WebApi.Application.Models.Photographer;
 using Microsoft.AspNetCore.Mvc;
 using Common.Core.Data.Interfaces;
-using Common.WebApi.Application.Controllers.Generic;
+using Common.Core.Generic.Controllers;
 
 namespace Common.WebApi.Application.Controllers
 {

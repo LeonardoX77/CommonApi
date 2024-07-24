@@ -4,9 +4,9 @@
     using Common.WebApi.Application.Models.User;
     using Common.WebApi.Application.Services.Interfaces;
     using Common.WebApi.Infrastructure.CustomAttributes;
-    using Common.WebApi.Infrastructure.Models.Response;
     using System.Threading.Tasks;
     using Common.Core.Data.Identity;
+    using Common.Core.Generic.Controllers.Response;
 
     [Route("api/v1/auth")]
     public class AuthController : ControllerBase

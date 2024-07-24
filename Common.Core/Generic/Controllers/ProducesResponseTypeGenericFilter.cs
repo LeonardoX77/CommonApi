@@ -2,7 +2,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
-namespace Common.WebApi.Application.Controllers.Generic
+namespace Common.Core.Generic.Controllers
 {
     /// <summary>
     /// Operation filter to apply the generic response type in Swagger documentation.

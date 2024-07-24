@@ -9,10 +9,10 @@ using Common.Core.Data.Wrappers;
 using Common.Domain.Entities;
 using System.Net;
 using Common.WebApi.Application.Controllers;
-using Common.WebApi.Infrastructure.Models.Response;
 using Common.Core.CustomExceptions;
 using Common.Tests.Infrastructure.AutoMoq;
 using Common.Core.Data.Identity.Enums;
+using Common.Core.Generic.Controllers.Response;
 
 namespace Common.Tests.Controllers
 {
@@ -22,9 +22,9 @@ namespace Common.Tests.Controllers
         public async Task GetAsync_ById_OK(
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
-            ClientRequestDto dto)
+            ClientResponseDto dto)
         {
-            service.Setup(service => service.GetByPKAsync<ClientRequestDto>(It.IsAny<int>())).ReturnsAsync(() => dto);
+            service.Setup(service => service.GetByPKAsync<ClientResponseDto>(It.IsAny<int>())).ReturnsAsync(() => dto);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -35,9 +35,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<OkObjectResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
+            result.Value.Should().BeOfType<Response<ClientResponseDto>>();
 
-            var body = result.Value.As<Response<ClientRequestDto>>();
+            var body = result.Value.As<Response<ClientResponseDto>>();
             body.Data.Should().NotBeNullOrEmpty();
             body.Data.Count.Should().Be(1);
             body.Error.Should().BeNull();
@@ -50,7 +50,7 @@ namespace Common.Tests.Controllers
             [Frozen] Mock<IBaseService<Client, int>> service,
             int id)
         {
-            service.Setup(service => service.GetByPKAsync<ClientRequestDto>(id)).ReturnsAsync(() => null);
+            service.Setup(service => service.GetByPKAsync<ClientResponseDto>(id)).ReturnsAsync(() => null);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -70,13 +70,13 @@ namespace Common.Tests.Controllers
             [Frozen] Mock<ILogger<ClientController>> log,
             [Frozen] Mock<IBaseService<Client, int>> service,
             ClientQueryFilter filter,
-            PaginatedResult<ClientRequestDto> expectedEntities)
+            PaginatedResult<ClientResponseDto> expectedEntities)
         {
             expectedEntities.Page = 1;
             expectedEntities.PageSize = 50;
             expectedEntities.TotalCount = expectedEntities.Items.Count();
 
-            service.Setup(service => service.Get<ClientRequestDto, ClientQueryFilter>(filter)).ReturnsAsync(expectedEntities);
+            service.Setup(service => service.Get<ClientResponseDto, ClientQueryFilter>(filter)).ReturnsAsync(expectedEntities);
 
             var sut = new ClientController(log.Object, service.Object);
 
@@ -87,9 +87,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<OkObjectResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
+            result.Value.Should().BeOfType<Response<ClientResponseDto>>();
 
-            var body = result.Value.As<Response<ClientRequestDto>>();
+            var body = result.Value.As<Response<ClientResponseDto>>();
             body.Data.Should().NotBeEmpty();
             body.Error.Should().BeNull();
             body.TotalRecords.Should().Be(expectedEntities.TotalCount);
@@ -122,9 +122,9 @@ namespace Common.Tests.Controllers
 
             var result = response.As<CreatedAtRouteResult>();
             result.StatusCode.Should().Be((int)HttpStatusCode.Created);
-            result.Value.Should().BeOfType<Response<ClientRequestDto>>();
+            result.Value.Should().BeOfType<Response<ClientResponseDto>>();
 
-            var body = result.Value.As<Response<ClientRequestDto>>();
+            var body = result.Value.As<Response<ClientResponseDto>>();
             body.Data.Should().NotBeNullOrEmpty();
             body.Data.Count.Should().Be(1);
             body.Error.Should().BeNull();

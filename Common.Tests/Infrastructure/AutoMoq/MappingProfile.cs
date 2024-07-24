@@ -1,4 +1,6 @@
 using AutoMapper;
+using Common.Domain.Entities;
+using Common.WebApi.Application.Models.Client;
 using System.Reflection;
 
 namespace Common.Tests.Infrastructure.AutoMoq
@@ -10,7 +12,7 @@ namespace Common.Tests.Infrastructure.AutoMoq
         public MappingProfile(Assembly assembly)
         {
             this.assembly = assembly;
-            // CreateMap<SourceType, DestinationType>();
+            CreateMap<Client, ClientResponseDto>();
         }
     }
 }

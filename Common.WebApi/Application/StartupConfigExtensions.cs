@@ -18,13 +18,12 @@ using Common.Business.Services;
 using Common.Core.Data.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Common.Core.CustomExceptions;
-using Common.WebApi.Infrastructure.Models.Response;
 using FluentValidation;
 using Serilog;
 using Common.Business.Repositories;
-using System.Diagnostics;
 using Common.Core.Generic.DynamicQueryFilter.DynamicExpressions;
-using Common.WebApi.Application.Controllers.Generic;
+using Common.Core.Generic.Controllers;
+using Common.Core.Generic.Controllers.Response;
 
 namespace Common.WebApi.Application
 {

@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Common.WebApi.Infrastructure.Models.Response
+namespace Common.Core.Generic.Controllers.Response
 {
 
 
@@ -19,7 +19,7 @@ namespace Common.WebApi.Infrastructure.Models.Response
         /// </summary>
         public ApiError Error { get; set; } = null;
         public int? StatusCode { get; set; }
-        
+
         private bool _success = false;
         public bool Success
         {
@@ -34,7 +34,7 @@ namespace Common.WebApi.Infrastructure.Models.Response
         }
 
 
-        public string Message { get; internal set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// Constructor for generic errors

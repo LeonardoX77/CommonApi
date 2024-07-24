@@ -9,10 +9,10 @@ using Common.Core.Data.Wrappers;
 using Common.Domain.Entities;
 using System.Net;
 using Common.WebApi.Application.Controllers;
-using Common.WebApi.Infrastructure.Models.Response;
 using Common.Core.CustomExceptions;
 using Common.Tests.Infrastructure.AutoMoq;
 using Common.Core.Data.Identity.Enums;
+using Common.Core.Generic.Controllers.Response;
 
 namespace Common.Tests.Controllers
 {
