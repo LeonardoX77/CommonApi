@@ -7,6 +7,8 @@ using System.Net;
 
 using Microsoft.AspNetCore.Authorization;
 using Common.Core.Generic.DynamicQueryFilter.Interfaces;
+using Common.WebApi.Application.Models.Client;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Common.WebApi.Application.Controllers.Generic
 {
@@ -17,17 +19,19 @@ namespace Common.WebApi.Application.Controllers.Generic
     /// - Handles CRUD operations using HTTP verbs.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    /// <typeparam name="TDto">The DTO type.</typeparam>
+    /// <typeparam name="TRequestDto">The DTO request type.</typeparam>
+    /// <typeparam name="TResponseDto">The DTO response type.</typeparam>
     /// <typeparam name="TQueryFilter">The query filter type.</typeparam>
     /// <typeparam name="TValidator">The validator type.</typeparam>
     [ApiController]
     [Authorize]
     [Route("api/v1/[controller]")]
-    public class GenericControllerBase<TEntity, TDto, TQueryFilter, TValidator> : BaseController<TEntity, int>
+    public class GenericControllerBase<TEntity, TRequestDto, TResponseDto, TQueryFilter, TValidator> : BaseController<TEntity, int>
         where TEntity : class, IEntity
-        where TDto : class, IEntity
+        where TRequestDto : class, IEntity
+        where TResponseDto : class, IEntity
         where TQueryFilter : class, IDynamicQueryFilter, IPagination, new()
-        where TValidator : AbstractValidator<TDto>, new()
+        where TValidator : AbstractValidator<TRequestDto>, new()
     {
         public GenericControllerBase(
             ILogger<BaseController<TEntity, int>> logger, 
@@ -38,10 +42,11 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="id"></param>
         [HttpGet("{id}", Name = $"[controller]/{nameof(Get)}")]
-        //[HttpGet("{id}", Name = "[controller]/GetById")]
-        public async Task<IActionResult> Get(int id)
+        [ProducesGenericResponseType(typeof(Response<>), nameof(TResponseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse), (int)HttpStatusCode.BadRequest)]
+        public virtual async Task<IActionResult> Get(int id)
         {
-            return await base.Get<TDto>(id);
+            return await base.Get<TResponseDto>(id);
         }
 
         /// <summary>
@@ -49,9 +54,11 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="filter"></param>
         [HttpPost("query")]
-        public async Task<IActionResult> Query(TQueryFilter filter)
+        [ProducesGenericResponseType(typeof(Response<>), nameof(TResponseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public virtual async Task<IActionResult> Query(TQueryFilter filter)
         {
-            return await base.Get<TDto, TQueryFilter>(filter);
+            return await base.Get<TResponseDto, TQueryFilter>(filter);
         }
 
         /// <summary>
@@ -59,9 +66,11 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="dto"></param>
         [HttpPost]
-        public virtual async Task<IActionResult> Create([FromBody] TDto dto)
+        [ProducesResponseType(typeof(CreatedAtRoute), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public virtual async Task<IActionResult> Create([FromBody] TRequestDto dto)
         {
-            return await base.Create<TDto, TValidator>(dto);
+            return await base.Create<TResponseDto, TRequestDto, TValidator>(dto);
         }
 
         /// <summary>
@@ -69,9 +78,12 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="dto"></param>
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] TDto dto)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public virtual async Task<IActionResult> Update([FromBody] TRequestDto dto)
         {
-            return await base.Update<TDto, TValidator>(CrudAction.UPDATE, dto.Id, dto);
+            return await base.Update<TRequestDto, TValidator>(CrudAction.UPDATE, dto.Id, dto);
         }
 
         /// <summary>
@@ -79,9 +91,12 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="dto"></param>
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody] TDto dto)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public virtual async Task<IActionResult> Patch([FromBody] TRequestDto dto)
         {
-            return await base.Update<TDto, TValidator>(CrudAction.UPDATE_PATCH, dto.Id, dto);
+            return await base.Update<TRequestDto, TValidator>(CrudAction.UPDATE_PATCH, dto.Id, dto);
         }
 
         /// <summary>
@@ -89,9 +104,12 @@ namespace Common.WebApi.Application.Controllers.Generic
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public virtual async Task<IActionResult> Delete(int id)
         {
-            return await base.Delete<TDto, TValidator>(id);
+            return await base.Delete<TRequestDto, TValidator>(id);
         }
     }
 }

@@ -24,6 +24,7 @@ using Serilog;
 using Common.Business.Repositories;
 using System.Diagnostics;
 using Common.Core.Generic.DynamicQueryFilter.DynamicExpressions;
+using Common.WebApi.Application.Controllers.Generic;
 
 namespace Common.WebApi.Application
 {
@@ -254,6 +255,8 @@ namespace Common.WebApi.Application
                 var filePath = Path.Combine(AppContext.BaseDirectory, $"{xmlAssemblyName}.xml");
 
                 c.IncludeXmlComments(filePath);
+
+                c.OperationFilter<ProducesResponseTypeGenericFilter>();
             });
 
             return services;
